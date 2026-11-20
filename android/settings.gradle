@@ -1,4 +1,19 @@
 rootProject.name = 'Listen1'
+
+// jcenter 已停止服务：将各级工程中声明的 jcenter 自动重定向到阿里云镜像
+gradle.allprojects { project ->
+    def redirectJcenter = { repos ->
+        repos.whenObjectAdded { repo ->
+            if (repo instanceof org.gradle.api.artifacts.repositories.MavenArtifactRepository &&
+                    repo.url.toString().contains('jcenter')) {
+                repo.url = 'https://maven.aliyun.com/repository/jcenter'
+            }
+        }
+    }
+    redirectJcenter(project.buildscript.repositories)
+    redirectJcenter(project.repositories)
+}
+
 include ':@react-native-community_async-storage'
 project(':@react-native-community_async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/async-storage/android')
 include ':react-native-music-control'

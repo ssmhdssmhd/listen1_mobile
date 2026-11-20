@@ -10,7 +10,10 @@ buildscript {
     }
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        // jcenter 已于 2022 年停止服务，使用阿里云镜像兜底老依赖
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        maven { url "https://maven.aliyun.com/repository/public" }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.4.0")
@@ -22,9 +25,11 @@ buildscript {
 
 allprojects {
     repositories {
-        mavenLocal()
         google()
-        jcenter()
+        mavenCentral()
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url "https://maven.aliyun.com/repository/google" }
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"

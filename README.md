@@ -1,6 +1,9 @@
-# Listen1 Mobile V0.8.1
+# Listen1 Mobile V0.8.2
+
+<p align="center"><img src="https://raw.githubusercontent.com/ssmhdssmhd/MXLOGO/main/web/web-logo.png" width="160"/></p>
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
+[![Build APK](https://github.com/ssmhdssmhd/listen1_mobile/actions/workflows/build.yml/badge.svg)](https://github.com/ssmhdssmhd/listen1_mobile/actions/workflows/build.yml)
 
 ## 简介
 
@@ -21,11 +24,27 @@
 
 ## 下载
 
-Github 主页下载： https://listen1.github.io/listen1
+- Release 页面（推荐）：<https://github.com/ssmhdssmhd/listen1_mobile/releases>
+- 每次推送 `master` 后，GitHub Actions 会自动编译签名 APK，并在 Actions 运行页面的 `Artifacts` 中提供下载。
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-    alt="Get it on F-Droid"
-    height="80">](https://f-droid.org/packages/com.listen1.app)
+> 本仓库 APK 使用固定签名（`com.listen1.app`），后续版本可直接覆盖升级；与官方 F-Droid 版本的签名不同，二者不能互相覆盖安装，安装前请先卸载旧版。
+
+## 云端构建（GitHub Actions）
+
+仓库已配置 [`.github/workflows/build.yml`](.github/workflows/build.yml)，推送代码到 `master` 或手动触发 `workflow_dispatch` 即可在云端完成编译、签名、产物上传与 Release 发布。
+
+- 运行环境：Ubuntu 22.04 + JDK 8（Gradle）/ JDK 17（Android SDK）+ Node.js 12 + Android SDK 28
+- 依赖仓库：`google()` / `mavenCentral()` / 阿里云镜像（替代已下线的 jcenter）
+- 签名文件：由仓库 Secrets `KEYSTORE_BASE64` 解码注入，密码来自 `KEYSTORE_PASSWORD` / `KEY_PASSWORD`
+- 产物命名：`Listen1.<版本号>.<构建时间 yyyyMMddHHmm>.apk`
+
+首次使用或更换签名时，需要配置以下 Secrets：
+
+| Secret | 说明 |
+|--------|------|
+| `KEYSTORE_BASE64` | 签名 keystore 的 Base64 内容 |
+| `KEYSTORE_PASSWORD` | keystore 密码 |
+| `KEY_PASSWORD` | key 密码（与 keyAlias 对应） |
 
 ## 安装
 
@@ -33,17 +52,17 @@ Github 主页下载： https://listen1.github.io/listen1
 
 iOS 只支持编译安装，请拥有开发者证书的开发者连接 iPhone 后，将项目文件中的证书换成自己的证书，然后执行命令安装。
 
-### Andriod
+### Android
 
-下载 apk 安装, apk 下载地址请访问[项目 release 页面](https://github.com/listen1/listen1_mobile/releases)
+下载 Release 中的 `Listen1.*.apk` 安装即可。
 
-## 编译
+## 本地编译
 
 开发环境
 
 - Java 8 JDK （更高版本需更新默认 gradle 版本）
-- Nodejs 8 （版本>12.10.0 可能遇到 metro 一个关于正则表达式的 bug 导致的启动失败）
-- Android Studio (Android SDK 版本 v28)
+- Node.js 12（版本 >12.10.0 可能遇到 metro 正则表达式 bug 导致启动失败，云端构建已固定为 `12.22.12`）
+- Android SDK 28（`platforms;android-28` + `build-tools;28.0.3`）
 
 编译步骤
 
@@ -53,16 +72,16 @@ iOS 只支持编译安装，请拥有开发者证书的开发者连接 iPhone �
 - `yarn start:ios` 将在 iOS 模拟器上运行项目
 - `yarn start:android` 将在安卓真机或模拟器（取决于手机是否连接）运行项目
 
-Apk 打包
+APK 打包
 
-```
-   cd .\android\
-   ./gradlew assembleRelease
-   react-native run-android --variant=release
-
+```bash
+cd android
+./gradlew assembleRelease
 ```
 
-更详细的打包信息（包括生成 keystone）
+本地签名需将 keystore 放到 `android/app/my-release-key.keystore`，并在 `android/gradle.properties` 或环境变量中提供 `MYAPP_UPLOAD_STORE_PASSWORD` 与 `MYAPP_UPLOAD_KEY_PASSWORD`。未提供 keystore 时将跳过 release 签名（产物不可直接分发）。
+
+更详细的打包信息（包括生成 keystore）
 
 https://reactnative.cn/docs/signed-apk-android
 
@@ -85,6 +104,15 @@ https://reactnative.cn/docs/signed-apk-android
 开发过程还有很多开源软件提供了各种问题的解决方案，详见代码注释，篇幅原因不一一列出，感谢开源社区的各位开发者。
 
 ## 更新日志
+
+`2026-11-21` · v0.8.2
+
+- 重写 GitHub Actions 云端打包流程：JDK 8 + Node 12 + Android SDK 28，推送即自动编译签名 APK
+- 替换已停止服务的 jcenter，改用 `mavenCentral` 与阿里云镜像，修复云端依赖拉取失败
+- 新增固定签名配置：keystore 通过仓库 Secrets 注入，APK 自动签名并校验，支持后续版本覆盖升级
+- APK 产物按 `Listen1.<版本号>.<构建时间>.apk` 命名，自动上传 Artifacts 并发布 Release
+- 版本号升级至 0.8.2（versionCode 2），版本号统一读取 `package.json`
+- 同步更新 README：下载方式、云端构建说明、签名说明与更新日志
 
 `2020-10-31`
 
