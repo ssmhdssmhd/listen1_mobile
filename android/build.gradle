@@ -24,6 +24,12 @@ buildscript {
 }
 
 allprojects {
+    configurations.all {
+        resolutionStrategy {
+            // 固定 React Native 版本，避免子工程使用 "+" 动态版本时解析到远端仓库的其他版本
+            force "com.facebook.react:react-native:0.59.9"
+        }
+    }
     repositories {
         google()
         mavenCentral()
