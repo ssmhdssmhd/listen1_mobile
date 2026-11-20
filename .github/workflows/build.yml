@@ -29,6 +29,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # 新版 SDK 已移除 "tools" 包，默认值会导致 sdkmanager 失败
+          packages: 'platform-tools'
 
       - name: Install Android SDK packages
         run: |
